@@ -1,0 +1,97 @@
+		学习 git 的使用，参考：廖雪峰官网里的 git 教程
+
+git init -- 初始化 git 仓库
+
+git add [ file]  -- 将需要提交的文件放置在 git 仓库里
+
+git commit -m [ message ]  --  提交到 git 仓库里面
+
+git status ---  查看仓库当前状态
+
+git diff  --   查看当前文件与仓库不一致的地方
+
+git log  --  查看提交的版本    [  --pretty=oneline  ]
+git reflog  --  记录每一次命令的 id
+
+git tag v1.0   ---   打一个标签至当前 commit
+git tag v1.0  id  ---   在 commit id  打入标签
+git tag -a v1.0 -m [ message ] id   ---   给 id 添加标签并说明
+git tag   ---   查看标签
+git tag -d v1.0   ----     删除标签
+
+git show <tagname>   ---   查看标签信息
+
+git reset --hard HEAD~1 [前几次版本]  --- 当前版本回退到以前的版本
+git reset --hard [ id ]  --  前往指定 id 的版本
+git reset HEAD file    ----   把放在暂存区的修改撤销掉，重新放回工作区 回到前面一步
+
+git checkout -- file   ----   版本库里的版本替换工作区的版本
+git checkout -b dev   ----   创建并切换分支  等同于  
+git branch dev  ---   创建分支
+git checkout dev  ----   切换分支
+git checkout -b branch-name origin/branch-name   ---  在本地创建和远程分支对应的分支
+
+git branch   ----   查看当前分支
+git branch -d dev  ----   删除 dev 分支
+git branch -D [ name ]   ---    丢弃一个没有合并的分支，强行删除
+git branch --set-upstream-to <branch-name> origin/<branch-name>   ---   创建本地分支和远程分支链接关系
+
+git merge dev  ---   合并分支
+git merge --no-ff -m "merge with no-ff" dev   ---   合并 dev 分支，禁用 Fast Forward 。
+
+git stash   ----   保存现场
+git stash list   ----    查看保存工作现场
+git stash pop  ---  恢复现场同时删除 stash 内容
+git stash apply   ---   恢复现场
+git stash drop   ---   删除 stash 内容
+git stash apply stash@{0}   ---   恢复指定 stash
+
+git rm file
+git commit -m [ message ] ---  工作区删除文件，并同步到仓库中
+
+
+
+创建 ssh key。
+用户主目录 .ssh 目录下 id_rsa 和 id_rsa.pub。若无则： ssh-keygen -t rsa -C "youremail@example.com"
+在 github 上添加 ssh。在 account setting里 add ssh key 里粘贴 id_rsa.pub
+
+git remote add origin gitUrl  ----  本地库与远程库库相关联远程库名为 origin
+git remote -v   ---   查看远程库信息
+git remote rm origin  ---   删除已关联名为 origin 的远程库
+
+git push -u origin master  ---  第一次推送 master 分支所有内容 【本地库提交到远程库指定本地分支，推送远程库对应分支上】  git push origin master   ---   此后推送
+git push --set-upstream origin dev   --- 远程创建一个名为dev的分支
+git push origin <tagname>   ---    推送标签到远程
+git pub origin --tags   ---  一次性全部推送所有标签
+删除远程标签:   1.先删除本地标签 git tag -d v1.0   2.远程删除   git push origin :refs/tags/v1.0
+
+git pull  ---   远程库与本地库合并
+
+git clone gitUrl   ---   克隆一个本地库
+
+git config --global color.ui true   ---   文件名会标上颜色
+git config --global user.email"XXX@qq.com"  --- 全局设置用户 email
+
+ssh-keygen -t rsa -C "XXX@qq.com"   ---  生成公钥绑定 git 才可以提交值远程库
+ssh -T git@github.com  ---  验证是否与 github 连接成功
+
+git 修改别名
+git config --global alias.st status  < 将 status 可以用 st 来表示 >
+自己搭建 Git 服务器
+1. 安装 git 
+	sudo apt-get install git
+2. 创建 git 用户，用来运行 git 服务器
+	sudo adduser git
+3. 创建证书登录
+	收集所有需要登录的用户的公钥，就是他们自己的id_rsa.pub文件，把所有公钥导入到/home/git/.ssh/authorized_keys文件里，一行一个。
+4. 初始化 git 仓库
+	* 选定一个目录作为 git 仓库，假设为 /srv/sample.git，在/srv目录下输入命令将会创建一个裸仓库
+		sudo git init --bare sample.git
+	* 裸仓库没有工作区，防止用户登录服务器上去修改工作区，并且服务器 git 仓库通常以 .git 结尾。把 owner 改为 git
+		sudo git init -R git:git sample.git
+5. 禁用 shell 登录，可以通过 ssh 使用 git
+		编辑 /etc/passwd 文件 将类似于 git:x:1001:1001:,,,:/home/git:/bin/bash 改为 git:x:1001:1001:,,,:/home/git:/usr/bin/git-shell
+6. 克隆远程仓库
+	git clone git@server:/srv/sample.git
+管理公钥用 Gitosis
+控制权限  Gitolite
